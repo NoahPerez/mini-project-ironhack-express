@@ -2,7 +2,7 @@ import express from "express"
 import morgan from "morgan"
 import cookieParser from "cookie-parser"
 import cors from "cors"
-
+import "dotenv/config"
 const PORT = 5005;
 
 
