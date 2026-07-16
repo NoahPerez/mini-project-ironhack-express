@@ -1,7 +1,10 @@
-const express = require("express");
-const morgan = require("morgan");
-const cookieParser = require("cookie-parser");
+import express from "express"
+import morgan from "morgan"
+import cookieParser from "cookie-parser"
+import cors from "cors"
+
 const PORT = 5005;
+
 
 // STATIC DATA
 // Devs Team - Import the provided files with JSON data of students and cohorts here:
@@ -20,16 +23,23 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors());
 
 
 // ROUTES - https://expressjs.com/en/starter/basic-routing.html
 // Devs Team - Start working on the routes here:
 // ...
 app.get("/docs", (req, res) => {
-  res.sendFile(__dirname + "/views/docs.html");
+  res.sendFile(import.meta.dirname + "/views/docs.html");
 });
 
+app.get("/api/cohorts", (req,res)=>{
+  res.sendFile(import.meta.dirname + "/cohorts.json")
+})
 
+app.get("/api/students", (req,res)=>{
+  res.sendFile(import.meta.dirname + "/students.json")
+})
 // START SERVER
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
