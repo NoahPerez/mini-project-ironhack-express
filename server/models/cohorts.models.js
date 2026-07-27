@@ -20,7 +20,7 @@ const CohortSchema = new Schema(
             enum: ["Full Time", "Part Time"]
         },
         campus: {
-            type: String,
+            type: [String],
             enum: ["Madrid", "Barcelona", "Miami", "Paris", "Berlin", "Amsterdam", "Lisbon", "Remote"]
         },
         startDate: { 
