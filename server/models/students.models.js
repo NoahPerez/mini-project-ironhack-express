@@ -25,8 +25,10 @@ const StudentsSchema = new Schema(
         image:
         {type:String, default: "https://i.imgur.com/r8bo8u7.png"},
         cohort: 
-        {type: Schema.Types.ObjectId, ref: "_id"}
-
+        {type: Schema.Types.ObjectId, ref: "Cohort"}
+         // I found the root cause: the student schema tells Mongoose that cohort references a model named "_id" ,
+         // but the actual registered model name is "Cohort" . 
+         // I’m previewing that targeted fix in the model now.
     }
 )
 const Student = model('Student', StudentsSchema)

@@ -1,9 +1,9 @@
 import express from "express"
-import mongoose from 'mongoose'
 import StudentModel from "../models/students.models.js"
 
 const router = express.Router();
 
+// POST /api/students - Creates a new student
 router.post("/students", async (req, res, next) => {
   try{
   const student = await StudentModel.create(req.body);
@@ -12,51 +12,29 @@ router.post("/students", async (req, res, next) => {
     next(err)
   }
 });
-//not work
 
-// GET /api/students
-router.get("/students", async (req, res) => {
-  try {
-    const student = await Student.find({}).populate("cohort")
-    res.status(201).json(student)
-  } catch (error) {
-    res.status()
-  }
-})
-//not working
-// router.get("/students", async (req, res, next) => {
-//   try{
-//   const students = await StudentModel.find({});
-//   res.json(students);
-//   }catch(err){
-//     next(err)
-//   }
-// });
 
-// GET /api/students/cohort/:cohortId
-
-router.get("/cohort/:cohortId", async (req, res) => {
-  try {
-    const students = await Student.find({
-      cohort: req.params.cohortId,
-    }).populate("cohort")
-
+// GET /api/students - Retrieves all of the students in the database collection
+router.get("/students", async (req,res,next)=>{
+  try{
+    const students = await StudentModel.find()
     res.json(students)
-  } catch (error) {
-    res.status(500).json({ error: error.message })
+  }catch(err){
+    next(err)
   }
 })
-//ITS WORKING
-// router.get("/students/cohort/:cohortId", async (req, res, next) => {
-//   try{
-//   const cohortObjectId = new mongoose.Types.ObjectId(req.params.cohortId);
-//   const students = await StudentModel.find({ cohort: cohortObjectId });
-//   res.json(students);
-//   }catch(err){
-//     next(err)
-//   }
-// });
 
+//GET /api/students/cohort/:cohortId - Retrieves all of the students for a given cohort
+router.get("/students/cohort/:cohortId", async (req, res) => {
+  try {
+    const students = await StudentModel.find({}).populate("cohort")
+    res.json(students)
+  } catch (err) {
+    next(err)
+  }
+})
+
+// GET /api/students/:studentId - Retrieves a specific student by id
 router.get("/students/:studentId", async (req, res,next) => {
   try{
   const student = await StudentModel.findById(req.params.studentId);
@@ -68,7 +46,8 @@ router.get("/students/:studentId", async (req, res,next) => {
     next(err)
   }
 });
-// ALSO WORKING
+
+// PUT /api/students/:studentId - Updates a specific student by id
 router.put("/students/:studentId", async (req, res, next) => {
   try{
       const updatedStudent = await StudentModel.findByIdAndUpdate(req.params.studentId, req.body, { new: true })
@@ -81,6 +60,7 @@ router.put("/students/:studentId", async (req, res, next) => {
   }
 });
 
+// DELETE /api/students/:studentId - Deletes a specific student by id
 router.delete("/students/:studentId", async (req, res, next) => {
   try{
   const deletedStudent = await StudentModel.findByIdAndDelete(req.params.studentId);
