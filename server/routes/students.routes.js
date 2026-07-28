@@ -25,9 +25,17 @@ router.get("/students", async (req,res,next)=>{
 })
 
 //GET /api/students/cohort/:cohortId - Retrieves all of the students for a given cohort
-router.get("/students/cohort/:cohortId", async (req, res) => {
+
+// It fixes GET /api/students/cohort/:cohortId so it:
+
+// - filters with cohort: req.params.cohortId
+// - includes next in the handler signature
+// - keeps .populate("cohort")
+router.get("/students/cohort/:cohortId", async (req, res, next) => {
   try {
-    const students = await StudentModel.find({}).populate("cohort")
+    const students = await StudentModel.find({
+      cohort: req.params.cohortId,
+    }).populate("cohort")
     res.json(students)
   } catch (err) {
     next(err)
@@ -35,9 +43,10 @@ router.get("/students/cohort/:cohortId", async (req, res) => {
 })
 
 // GET /api/students/:studentId - Retrieves a specific student by id
+//It updates GET /api/students/:studentId so it uses .populate("cohort") and returns a full cohort object to the client.
 router.get("/students/:studentId", async (req, res,next) => {
   try{
-  const student = await StudentModel.findById(req.params.studentId);
+  const student = await StudentModel.findById(req.params.studentId).populate("cohort");
   if(!student){
       return res.status(404).json({message: "Student not found"})
   }
