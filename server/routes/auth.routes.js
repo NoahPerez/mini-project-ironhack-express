@@ -9,9 +9,9 @@ const router = express.Router()
 router.post('/signup', async(req,res)=>{
     try{
     const {email, password, username} = req.body
-
+    
     if(!email || !password || !username){
-        return res.status(400).json({message: "Please provide all fields"})
+        return res.status(400).json({message: "Please provide email, username, and password"})
     }
     /*Minimum eight characters, at least one upper case English letter, one lower case English letter, one number and one special character*/
      const passwordRegex =
@@ -23,9 +23,9 @@ router.post('/signup', async(req,res)=>{
           "Password must be 8 characters long and contain one uppercase and one lowercase character, a number, and a special character.",
       })
     }
-    const foundName = await User.findOne({ $or:[{email},{username}] })
-    if (foundName){
-        return res.status(409).json({message:"Name already exists"})
+    const existingUser = await User.findOne({ $or:[{email},{username}] })
+    if (existingUser){
+        return res.status(409).json({message:"Email or username already exists"})
     }
     const salts = await bcrypt.genSalt(10)
 
@@ -59,7 +59,10 @@ router.post('/login', async (req,res)=>{
     }
 
     const foundUser = await User.findOne({$or:[{email},{username}] })
-
+    if(!foundUser){
+      return res.status(404).json({message: "User not found"})
+    }
+    
     const passwordCheck = await bcrypt.compare(password, foundUser.password)
 
     if (!passwordCheck){
@@ -75,10 +78,18 @@ router.post('/login', async (req,res)=>{
       process.env.TOKEN_SECRET,
       {algorithm: "HS256", expiresIn: "1h"},
     )
+    
+
+// We need the hashed password on the backend to compare credentials during login,
+// but we should never return it in the API response.
+// Convert the Mongoose document to a plain object, remove the password field,
+// and send back a safe version of the user.
+    const safeUser = foundUser.toObject()
+    delete safeUser.password
 
     res
       .status(200)
-      .json({message: 'Logged in successfully', token, user: foundUser})
+      .json({message: 'Logged in successfully', token, user: safeUser})
 } catch(error){
   console.log(error)
   res.status(500).json(error)
@@ -86,9 +97,27 @@ router.post('/login', async (req,res)=>{
 })
 
 router.get("/verify", isAuth, (req,res)=>{
-  console.log(req.user)
-  res.status(200).json({user:req.user})
+  
+  res.status(200).json({ user: req.payload })
 })
 
-export default router;
+// router.get("/verify", isAuth, (req,res)=>{
+//   console.log(req.user.payload)
+//   res.status(200).json({user:req.user})
+// })
 
+// Because your JWT middleware stores the decoded token on req.payload , not on req.user .
+
+// The key reason
+
+// - In jwt.middleware.js , you configured:
+//   - requestProperty: 'payload'
+// That means after isAuth runs, the decoded JWT is attached here:
+
+// - req.payload
+// not here:
+
+// - req.user
+// So this version matches your middleware
+
+export default router;

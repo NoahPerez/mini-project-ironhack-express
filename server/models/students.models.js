@@ -31,5 +31,4 @@ const StudentsSchema = new Schema(
          // I’m previewing that targeted fix in the model now.
     }
 )
-const Student = model('Student', StudentsSchema)
-export default Student
+export default model("Student", StudentsSchema)

@@ -50,5 +50,4 @@ const CohortSchema = new Schema(
     { timestamps: true } 
 );
 
-const Cohort = model('Cohort', CohortSchema);
-export default Cohort;
+export default model("Cohort", CohortSchema);

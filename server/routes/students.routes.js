@@ -17,7 +17,7 @@ router.post("/students", async (req, res, next) => {
 // GET /api/students - Retrieves all of the students in the database collection
 router.get("/students", async (req,res,next)=>{
   try{
-    const students = await StudentModel.find()
+    const students = await StudentModel.find({})
     res.json(students)
   }catch(err){
     next(err)
@@ -33,9 +33,7 @@ router.get("/students", async (req,res,next)=>{
 // - keeps .populate("cohort")
 router.get("/students/cohort/:cohortId", async (req, res, next) => {
   try {
-    const students = await StudentModel.find({
-      cohort: req.params.cohortId,
-    }).populate("cohort")
+    const students = await StudentModel.find({cohort: req.params.cohortId,}).populate("cohort")
     res.json(students)
   } catch (err) {
     next(err)
