@@ -16,31 +16,33 @@ function UserProfilePage() {
   const [errorMessage, setErrorMessage] = useState(undefined);
 
   useEffect(() => {
-    const getStudent = () => {
+    const getUserProfile = () => {
       const storedToken = localStorage.getItem("authToken");
 
-      if (storedToken) {
-        axios
-        .get(
-          `${API_URL}/api/users/${user._id}`,
-          { headers: { Authorization: `Bearer ${storedToken}` }}
-          )
-          .then((response) => {
-            setUserProfile(response.data);
-            setLoading(false);
-          })
-          .catch((error) => {
-            const errorDescription = error.response.data.message;
-            setErrorMessage(errorDescription);
-          });
-        }
-        else {
-          setErrorMessage("User not logged in");
-        }
+      if (!storedToken || !user?._id) {
+        setLoading(false);
+        setErrorMessage("User not logged in");
+        return;
+      }
+
+      axios
+        .get(`${API_URL}/api/users/${user._id}`, {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        })
+        .then((response) => {
+          setUserProfile(response.data);
+          setErrorMessage(undefined);
+          setLoading(false);
+        })
+        .catch((error) => {
+          const errorDescription = error.response?.data?.message || "Unable to load user profile";
+          setErrorMessage(errorDescription);
+          setLoading(false);
+        });
     };
 
-    getStudent();
-  }, [user._id]);
+    getUserProfile();
+  }, [user?._id]);
 
   if (errorMessage) return <div>{errorMessage}</div>;
   
@@ -57,7 +59,7 @@ function UserProfilePage() {
             alt="profile-photo"
             className="rounded-full w-32 h-32 object-cover border-2 border-gray-300"
           />            
-            <h1 className="text-2xl mt-4 font-bold absolute">{userProfile.name}</h1>
+            <h1 className="text-2xl mt-4 font-bold absolute">{userProfile.username}</h1>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-24 mb-4 border-b pb-4">
               <p className="text-left mb-2 border-b pb-2">

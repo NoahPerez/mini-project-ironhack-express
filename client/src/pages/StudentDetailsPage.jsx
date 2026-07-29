@@ -29,6 +29,13 @@ function StudentDetailsPage() {
   
   if (loading) return <div>Loading...</div>;
 
+  const linkedInUrl = student?.linkedinUrl || student?.linkedInURl;
+  const languages = Array.isArray(student?.languages) ? student.languages : [];
+  const program = Array.isArray(student?.program) ? student.program.join(", ") : student?.program || "";
+  const projects = Array.isArray(student?.projects) ? student.projects : [];
+  const cohortId = typeof student?.cohort === "object" ? student?.cohort?._id : student?.cohort;
+  const cohortName = typeof student?.cohort === "object" ? student?.cohort?.cohortName : student?.cohort;
+
   return (
     <div className="StudentDetailsPage bg-gray-100 py-6 px-4">
       <div className="bg-white p-8 rounded-lg shadow-md mb-6">
@@ -54,26 +61,30 @@ function StudentDetailsPage() {
                 <strong>Phone:</strong> {student.phone}
               </p>
               <p className="text-left mb-2 border-b pb-2">
-                <strong>LinkedIn:</strong> {student.linkedinUrl}
+                <strong>LinkedIn:</strong> {linkedInUrl || "N/A"}
               </p>
               <p className="text-left mb-2 border-b pb-2">
-                <strong>Languages:</strong> {student.languages.join(", ")}
+                <strong>Languages:</strong> {languages.length ? languages.join(", ") : "N/A"}
               </p>
               <p className="text-left mb-2 border-b pb-2">
-                <strong>Program:</strong> {student.program}
+                <strong>Program:</strong> {program || "N/A"}
               </p>
               <p className="text-left mb-2 border-b pb-2">
                 <strong>Background:</strong> {student.background}
               </p>
               <p className="text-left mb-2 border-b pb-2">
-                <strong>Cohort:</strong> 
-                <Link className="ml-2 text-blue-500 hover:underline" to={`/cohorts/details/${student.cohort._id}`}>
-                  {student.cohort.cohortName}
-                </Link>
+                <strong>Cohort:</strong>
+                {cohortId ? (
+                  <Link className="ml-2 text-blue-500 hover:underline" to={`/cohorts/details/${cohortId}`}>
+                    {cohortName || cohortId}
+                  </Link>
+                ) : (
+                  <span className="ml-2">N/A</span>
+                )}
               </p>
-              {student && student.projects.length > 0 && (
+              {projects.length > 0 && (
               <p className="text-left mb-2 border-b pb-2">
-                <strong>Projects:</strong> {student.projects}
+                <strong>Projects:</strong> {projects.join(", ")}
               </p>
               )}
             </div>
